@@ -27,10 +27,11 @@ class MyApp extends StatelessWidget {
         return ResponsiveBreakpoints.builder(
           child: child!,
           breakpoints: [
-            const Breakpoint(start: 0, end: 450, name: MOBILE),
-            const Breakpoint(start: 451, end: 800, name: TABLET),
-            const Breakpoint(start: 801, end: 1920, name: DESKTOP),
-            const Breakpoint(start: 1921, end: double.infinity, name: '4K'),
+            const Breakpoint(start: 0, end: 650, name: 'mobile'),
+            const Breakpoint(start: 651, end: 900, name: 'portraitTablet'),
+            const Breakpoint(start: 901, end: 1000, name: 'landscapeTablet'),
+            const Breakpoint(start: 1001, end: 1920, name: 'desktop'),
+            const Breakpoint(start: 1921, end: double.infinity, name: 'bigDesktop'),
           ],
         );
       },
@@ -72,7 +73,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     right: 0,
                     child: SizedBox(
                       height: MediaQuery.of(context).size.height - 100,
-                      width: MediaQuery.of(context).size.height - 100,
+                      width: MediaQuery.of(context).size.width * 0.5,
                       child: const RiveAnimation.asset(
                         'assets/rive/developer.riv',
                         fit: BoxFit.contain,
@@ -87,7 +88,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       padding: const EdgeInsets.all(20),
                       alignment: Alignment.topLeft,
                       height: MediaQuery.of(context).size.height - 100,
-                      width: MediaQuery.of(context).size.height - 100,
+                      width: MediaQuery.of(context).size.width * 0.5,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -136,6 +137,19 @@ class _MyHomePageState extends State<MyHomePage> {
             SizedBox(
               height: 100,
             ),
+            Container(
+              height: 100,
+              color: ResponsiveBreakpoints.of(context).equals('mobile')
+                  ? Colors.red
+                  : ResponsiveBreakpoints.of(context).equals('portraitTablet')
+                      ? Colors.green
+                      : ResponsiveBreakpoints.of(context).equals('landscapeTablet')
+                          ? Colors.blue
+                          : ResponsiveBreakpoints.of(context).equals('desktop')
+                              ? Colors.yellow
+                              : Colors.purple,
+            ),
+
 
             Container(
               padding: const EdgeInsets.all(20),
@@ -149,30 +163,33 @@ class _MyHomePageState extends State<MyHomePage> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  GridView(
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      mainAxisSpacing: 10,
-                      crossAxisSpacing: 20,
-                      childAspectRatio: 2,
-                    ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  // grid view (max item size 300)
+                  GridView.builder(
                     shrinkWrap: true,
-                    children: [
-                      CardApp(
-                        title: "Project number 1",
+                    physics: NeverScrollableScrollPhysics(),
+                    gridDelegate:  SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: ResponsiveBreakpoints.of(context).equals('mobile')
+                          ? 1
+                          : ResponsiveBreakpoints.of(context).equals('portraitTablet') || ResponsiveBreakpoints.of(context).equals('landscapeTablet')
+                              ? 2
+                              : 3,
+                      mainAxisSpacing: 16,
+                      crossAxisSpacing: 16,
+                      childAspectRatio:
+                      MediaQuery.of(context).size.width > 350 && MediaQuery.of(context).size.width < 650 ? 1.5 : 1.1
+                      ,
+                    ),
+                    itemCount: 3,
+                    itemBuilder: (context, index) {
+                      return CardApp(
+                        title: "Project ${index + 1}",
                         imgURL: "",
-                      ),
-                      CardApp(
-                        title: "Project number 2",
-                        imgURL: "",
-                      ),
-                      CardApp(
-                        title: "Project number 3",
-                        imgURL: "",
-                      ),
-                    ],
-                  )
+                      );
+                    },
+                  ),
                 ],
               ),
             )
